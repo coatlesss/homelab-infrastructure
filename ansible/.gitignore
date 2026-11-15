@@ -1,0 +1,14 @@
+# Private infrastructure details
+inventory.ini
+*.retry
+
+# SSH keys and secrets
+*.pem
+id_rsa
+id_ed25519*
+*.vault
+*.secret
+
+# Ansible temporary files
+*.log
+__pycache__/

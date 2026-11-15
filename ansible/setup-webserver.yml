@@ -1,0 +1,25 @@
+---
+- name: Configure Debian web server
+  hosts: linux_servers
+  become: true
+
+  tasks:
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: true
+
+    - name: Enable and start Nginx
+      ansible.builtin.systemd_service:
+        name: nginx
+        enabled: true
+        state: started
+
+    - name: Deploy custom webpage
+      ansible.builtin.copy:
+        src: files/index.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
