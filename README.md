@@ -63,7 +63,27 @@ These incidents are documented because identifying failure modes and validating 
 
 ## Evidence
 
-Screenshots will be added after removing identifying and sensitive data. See [screenshots checklist](screenshots/README.md). No screenshots here are simulated proof.
+The following screenshots were uploaded from the lab. They illustrate the working infrastructure; supporting implementation and troubleshooting details are in the linked documents above.
+
+### Proxmox host dashboard
+![Proxmox host dashboard](screenshots/proxmox-dashboard.png)
+
+### Virtual machine and container inventory
+![Proxmox VM and LXC inventory](screenshots/virtual-machines.png)
+
+### Ubuntu administration over SSH
+![Ubuntu Server SSH administration](screenshots/ubuntu-ssh.png)
+
+### Nginx web server
+![Nginx web service](screenshots/nginx-webserver.png)
+
+### Proxmox backup
+![Backup entry for Ubuntu VM](screenshots/vm-backup.png)
+
+### Uptime Kuma monitoring
+![Uptime Kuma monitoring dashboard](screenshots/uptime-monitoring.png)
+
+The screenshots show the environment but do not by themselves establish a completed incident-response or in-guest restore validation. Those remain documented separately.
 
 ## Next milestones
 
