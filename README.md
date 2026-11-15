@@ -1,65 +1,85 @@
 # Cloud & Systems Administration Homelab
 
-A hands-on infrastructure lab focused on Linux administration, virtualization, networking, infrastructure monitoring, backup and recovery, and cloud operations.
+> Practical infrastructure administration lab built on a refurbished Lenovo mini PC. **Status: actively developing.** This repository documents work performed, how it was verified, operational issues, and planned improvements.
 
-## Project Overview
+**Focus:** Linux administration · Virtualization · Networking · Monitoring · Backup & recovery · Cloud operations
 
-This homelab is designed to simulate real-world IT infrastructure administration. The goal is to develop practical skills in deploying, securing, monitoring, troubleshooting, and recovering server environments.
+## Overview
 
-The environment uses Proxmox VE for virtualization, Ubuntu Server for Linux administration, and Debian LXC containers for lightweight services.
+I built a local virtualization environment to practice the day-to-day responsibilities of systems administrators and cloud operations engineers: deploying Linux workloads, securing remote access, diagnosing connectivity, monitoring services, and restoring virtual machines.
 
-## Hardware
+The current environment is **one physical Proxmox node** hosting an Ubuntu Server VM and a Debian LXC monitoring container. A second physical node and cloud integration are future phases, not part of the completed deployment.
 
-| Component | Specification |
-|---|---|
-| Server | Lenovo ThinkCentre M710q Tiny |
-| Processor | Intel Core i3-6100T |
-| RAM | 8 GB |
+## Architecture
+
+[View the architecture diagram and design decisions](architecture/README.md)
+
+```mermaid
+flowchart LR
+    P["Lenovo M710q<br/>Proxmox VE"] --> U["Ubuntu VM 100<br/>SSH • Nginx"]
+    P --> K["Debian LXC 200<br/>Uptime Kuma"]
+    P --> B[("Local VM backup")]
+    K -. HTTP monitor .-> U
+```
+
+## Hardware and virtualization
+
+| Item | Configuration |
+| --- | --- |
+| Host | Lenovo ThinkCentre M710q Tiny |
+| CPU | Intel Core i3-6100T |
+| Memory | 8 GB RAM |
 | Storage | 256 GB SSD |
 | Hypervisor | Proxmox VE 9.2 |
+| VM 100 | Ubuntu Server LTS, 2 vCPUs, 2 GiB RAM, 25 GiB disk |
+| CT 200 | Debian 13 AMD64 LXC, Uptime Kuma |
 
-## Infrastructure
+## Implemented work
 
-### Virtualization
-- Installed and configured Proxmox VE
-- Configured local storage and virtual networking
-- Deployed an Ubuntu Server virtual machine
-- Deployed a Debian LXC container
-- Installed and configured the QEMU Guest Agent
+| Area | What was completed | Documentation |
+| --- | --- | --- |
+| Virtualization | Installed Proxmox, configured repositories and host updates, deployed VM and LXC | [Proxmox installation](docs/proxmox-installation.md) |
+| Linux administration | Set up Ubuntu Server, systemd services, SSH key authentication, QEMU Guest Agent and Nginx | [Ubuntu administration](docs/linux-server-setup.md) |
+| Networking | Configured host/guest addressing, tested routing and DNS, troubleshot IPv6 and resolver failures | [Networking](docs/networking.md) |
+| Backup and recovery | Created a VM backup and restored it into a separate temporary VM; cleaned up test resources | [Backup/recovery](docs/backup-recovery.md) |
+| Monitoring | Deployed Uptime Kuma in LXC and verified an HTTP monitor was UP for Nginx | [Monitoring](docs/monitoring.md) |
 
-### Linux and Network Administration
-- Installed Ubuntu Server
-- Configured a static IPv4 address
-- Set up SSH key-based remote access
-- Managed packages and systemd services
-- Configured and tested an Nginx web server
-- Troubleshot DNS and IPv6 connectivity problems
+### Troubleshooting case studies
 
-### Backup and Disaster Recovery
-- Created a Proxmox VM backup
-- Restored the backup into an isolated test VM
-- Practiced recovery verification and cleanup
+- [Proxmox package download failures: IPv6, DNS and HTTPS](troubleshooting/ipv6-dns-issues.md)
+- [Ubuntu VM "not a bootable disk" after installation](troubleshooting/vm-boot-recovery.md)
 
-### Infrastructure Monitoring
-- Deployed Uptime Kuma in a Debian LXC container
-- Configured HTTP monitoring for Nginx
-- Verified service availability through the monitoring dashboard
+These incidents are documented because identifying failure modes and validating fixes are as important as initial deployment.
 
-## Technologies Used
+## Demonstrated checks
 
-Proxmox VE, Ubuntu Server, Debian Linux, LXC, SSH, Nginx, Uptime Kuma, QEMU Guest Agent, Netplan, systemd.
+- Host web management interface reachable from another machine.
+- Ubuntu SSH key login successful.
+- Guest static IPv4, internet connectivity, and DNS resolution tested.
+- QEMU Guest Agent reported active.
+- Nginx welcome page reachable from a browser.
+- Backup and restore tasks reported successful; further in-guest recovery evidence is a follow-up.
+- Uptime Kuma displayed the Nginx HTTP monitor as UP.
 
-## Future Improvements
+## Evidence
 
-- Configure monitoring notifications and incident response
-- Establish an external backup destination
-- Deploy a second Proxmox host
-- Automate Linux administration with Ansible
-- Build Microsoft Azure administration labs
-- Document cloud identity, storage, networking, and monitoring exercises
+Screenshots will be added after removing identifying and sensitive data. See [screenshots checklist](screenshots/README.md). No screenshots here are simulated proof.
 
-## Project Goals
+## Next milestones
 
-Demonstrate practical infrastructure administration skills relevant to cloud administrator, systems administrator, cloud operations, and IT infrastructure roles.
+- [ ] Complete and document a Uptime Kuma DOWN → recovery test
+- [ ] Configure and verify notification delivery
+- [ ] Validate recovery with a known test file/checksum
+- [ ] Store backups on a separate physical device
+- [ ] Add the second physical Proxmox node
+- [ ] Use Ansible to apply a repeatable Linux configuration
+- [ ] Extend exercises into Azure administration (identity, compute, storage, networking, monitoring)
+- [ ] Later compare operations in AWS
 
-This repository documents the environment's configuration, troubleshooting, testing, and ongoing improvements.
+## Security and limitations
+
+This is a learning environment, not a production deployment. Both the monitor and the monitored web server currently share one physical host, so complete host failure also stops monitoring. The initial backup is on the same SSD as the VM, so it does not protect against physical disk failure. Do not publish credentials, private SSH keys, tokens, internal host inventories, or router configuration exports.
+
+## Why this project
+
+My goal is to build the operational skills needed for cloud administrator, systems administrator, cloud support, and infrastructure roles, with an emphasis on deployment, access, troubleshooting, reliability and recovery rather than application development.
