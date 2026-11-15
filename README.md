@@ -2,13 +2,13 @@
 
 > Practical infrastructure administration lab built on a refurbished Lenovo mini PC. **Status: actively developing.** This repository documents work performed, how it was verified, operational issues, and planned improvements.
 
-**Focus:** Linux administration · Virtualization · Networking · Monitoring · Backup & recovery · Cloud operations
+**Focus:** Linux administration · Virtualization · Networking · Ansible automation · Monitoring · Backup & recovery · Cloud operations
 
 ## Overview
 
 I built a local virtualization environment to practice the day-to-day responsibilities of systems administrators and cloud operations engineers: deploying Linux workloads, securing remote access, diagnosing connectivity, monitoring services, and restoring virtual machines.
 
-The current environment is **one physical Proxmox node** hosting an Ubuntu Server VM and a Debian LXC monitoring container. A second physical node and cloud integration are future phases, not part of the completed deployment.
+The current environment is **one physical Proxmox node** hosting an Ubuntu Server VM and two Debian LXC containers: monitoring and an Ansible-managed test web server. A second physical node and cloud integration are future phases, not part of the completed deployment.
 
 ## Architecture
 
@@ -18,7 +18,9 @@ The current environment is **one physical Proxmox node** hosting an Ubuntu Serve
 flowchart LR
     P["Lenovo M710q<br/>Proxmox VE"] --> U["Ubuntu VM 100<br/>SSH • Nginx"]
     P --> K["Debian LXC 200<br/>Uptime Kuma"]
+    P --> T["Debian LXC 201<br/>Ansible-managed Nginx"]
     P --> B[("Local VM backup")]
+    U -. "SSH / Ansible" .-> T
     K -. HTTP monitor .-> U
 ```
 
@@ -33,6 +35,7 @@ flowchart LR
 | Hypervisor | Proxmox VE 9.2 |
 | VM 100 | Ubuntu Server LTS, 2 vCPUs, 2 GiB RAM, 25 GiB disk |
 | CT 200 | Debian 13 AMD64 LXC, Uptime Kuma |
+| CT 201 | Debian 13 AMD64 LXC, Ansible-managed Nginx test server |
 
 ## Implemented work
 
@@ -43,6 +46,7 @@ flowchart LR
 | Networking | Configured host/guest addressing, tested routing and DNS, troubleshot IPv6 and resolver failures | [Networking](docs/networking.md) |
 | Backup and recovery | Created a VM backup and restored it into a separate temporary VM; cleaned up test resources | [Backup/recovery](docs/backup-recovery.md) |
 | Monitoring | Deployed Uptime Kuma in LXC and verified an HTTP monitor was UP for Nginx | [Monitoring](docs/monitoring.md) |
+| Automation | Used Ansible over SSH to install and enable Nginx, deploy a page, update it, and verify idempotence (changed=0) | [Ansible project and playbook](ansible/README.md) |
 
 ### Troubleshooting case studies
 
@@ -60,6 +64,7 @@ These incidents are documented because identifying failure modes and validating 
 - Nginx welcome page reachable from a browser.
 - Backup and restore tasks reported successful; further in-guest recovery evidence is a follow-up.
 - Uptime Kuma displayed the Nginx HTTP monitor as UP.
+- Ansible reached a Debian test container over SSH, deployed Nginx and a custom webpage, and reran with `changed=0`.
 
 ## Evidence
 
@@ -92,7 +97,8 @@ The screenshots show the environment but do not by themselves establish a comple
 - [ ] Validate recovery with a known test file/checksum
 - [ ] Store backups on a separate physical device
 - [ ] Add the second physical Proxmox node
-- [ ] Use Ansible to apply a repeatable Linux configuration
+- [x] Use Ansible to apply a repeatable Linux configuration to a Debian test container
+- [ ] Extend Ansible to multiple managed nodes and reusable roles
 - [ ] Extend exercises into Azure administration (identity, compute, storage, networking, monitoring)
 - [ ] Later compare operations in AWS
 
