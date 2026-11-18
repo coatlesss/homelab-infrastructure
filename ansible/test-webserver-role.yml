@@ -1,0 +1,7 @@
+---
+- name: Configure Debian using reusable roles
+  hosts: linux_servers
+  become: true
+
+  roles:
+    - webserver
